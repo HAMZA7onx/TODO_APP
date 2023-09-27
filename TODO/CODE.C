@@ -27,19 +27,14 @@ void back_menu() {
 // A function that hundle input errors in case of string:
 void input_string_handler(char* title, int string_size, const char* content) {
     char string[string_size];
-    int checker = 1;
-    do {
-        // Display the message:
-        puts(content);
-        printf("\t: ");
-        fgets(string, string_size, stdin);
-        // Converting the string to the rigth format: 
-        if (string[strlen(string) - 1] == '\n') string[strlen(string) - 1] = '\0'; 
-        else clean_buffer();
-        // Make sure that the string is not starting by an array:
-        if (atoi(string) == 0) checker = 0;
-        
-    } while (checker != 0);
+
+    // Display the message:
+    puts(content);
+    printf("\t: ");
+    fgets(string, string_size, stdin);
+    // Converting the string to the rigth format: 
+    if (string[strlen(string) - 1] == '\n') string[strlen(string) - 1] = '\0'; 
+    else clean_buffer();
     strcpy(title, string); 
 }
 
@@ -189,8 +184,23 @@ void add_new_task(Task* tasks, int* tasks_index, int* size, int caller_checker, 
     input_deadline(tasks[* tasks_index].deadline);
 
     // Asking the user to enter the status of the task:
-    input_string_handler(status, 10, "\tEnter The status Of The Task (Must Start By A Character): "); 
-
+    int choise;
+    do {
+        printf("\tEnter The status Of The Task: \n"); 
+        printf("\t1->TODO\n");
+        printf("\t2->DOING\n");
+        printf("\t3->DONE\n\t");
+        if(scanf("%d", &choise) != 1) choise = 0;
+        clean_buffer();
+    } while(choise != 1 && choise != 2 && choise != 3);
+    switch(choise) {
+        case 1: strcpy(status, "TODO");
+        break; 
+        case 2: strcpy(status, "DOING");
+        break; 
+        case 3: strcpy(status, "DONE");
+        break;
+    }
     // Increasing tasks_index by 1: 
     (* tasks_index)++;
 
@@ -269,11 +279,9 @@ void display_by_deadline(Task* tasks, int* tasks_index) {
             int currentMonth2 = atoi(m2);
             int currentYear2 = atoi(y2);
 
-            // Compare deadlines:
             if (currentYear2 < currentYear1 ||
                 (currentYear2 == currentYear1 && currentMonth2 < currentMonth1) ||
                 (currentYear2 == currentYear1 && currentMonth2 == currentMonth1 && currentDay2 < currentDay1)) {
-                // Swap tasks if the next task's deadline is earlier:
                 Task swap = tasks[j];
                 tasks[j] = tasks[j + 1];
                 tasks[j + 1] = swap;
@@ -313,8 +321,12 @@ void display_3_days(Task* tasks, int* tasks_index) {
 
         // Display the task if the deadline is within 3 days or less
         if (daysDifference <= 3) {
-            printf("\t-ID: %d\t-TITLE: %s\t-DESCRIPTION: %s\t-DEADLINE: %s\t-STATUS: %s\n",
-                tasks[i].id, tasks[i].title, tasks[i].description, tasks[i].deadline, tasks[i].status);
+            printf("\t>> %s\n", tasks[i].title);
+            printf("\t-- ID          : %d\n", tasks[i].id);
+            printf("\t-- DESCRIPTION : %s\n", tasks[i].description);
+            printf("\t-- DEADLINE    : %s\n", tasks[i].deadline);
+            printf("\t-- STATUS      : %s\n", tasks[i].status);
+            printf("\n");
         }
     }
 
@@ -332,25 +344,27 @@ void display_all_tasks(Task* tasks, int* tasks_index) {
             printf("\t1.Sort tasks alphabetically: \n"); 
             printf("\t2.Sort tasks by deadline: \n"); 
             printf("\t3.Show tasks whose deadline is in 3 days or less: \n");
-            printf("> ");
+            printf("\t> ");
             if (scanf("%d", &choise) != 1) choise = 0;
             clean_buffer();
         } while (choise < 1 || choise > 3);
         
         switch(choise) {
-            // Sort tasks alphabetically:
             case 1: display_alphabetically(tasks, tasks_index);
             break; 
-            // Sort tasks by deadline:
             case 2: display_by_deadline(tasks, tasks_index);
             break; 
-            // Show tasks whose deadline is in 3 days or less: 
             case 3: display_3_days(tasks, tasks_index);
             break;
         }
 
         for (int i = 0; i < * tasks_index; i++) {
-            printf("\t-ID: %d\t-TITLE: %s\t-DESCRIPTION: %s\t-DEADLINE: %s\t-STATUS: %s\n", tasks[i].id, tasks[i].title, tasks[i].description, tasks[i].deadline, tasks[i].status);
+            printf("\n\t>> %s\n", tasks[i].title);
+            printf("\t-- ID          : %d\n", tasks[i].id);
+            printf("\t-- DESCRIPTION : %s\n", tasks[i].description);
+            printf("\t-- DEADLINE    : %s\n", tasks[i].deadline);
+            printf("\t-- STATUS      : %s\n", tasks[i].status);
+            printf("\n");
         }
     }
 
@@ -359,7 +373,6 @@ void display_all_tasks(Task* tasks, int* tasks_index) {
 
 // A function that update task: 
 int find_index_ID(Task* tasks, int* tasks_index, int task_id) {
-    // linear search algorithm: 
     for (int i = 0; i < * tasks_index; i++) {
         if (tasks[i].id == task_id) {
             return i;
@@ -452,7 +465,12 @@ void search_by_id(Task* tasks, int* tasks_index) {
     if (index_id != -1) {
         for (int i = 0; i < * tasks_index; i++) {
             if (tasks[i].id == task_id) {
-                printf("\t-ID: %d\t-TITLE: %s\t-DESCRIPTION: %s\t-DEADLINE: %s\t-STATUS: %s\n", tasks[i].id, tasks[i].title, tasks[i].description, tasks[i].deadline, tasks[i].status);
+                printf("\t>> %s\n", tasks[i].title);
+                printf("\t-- ID          : %d\n", tasks[i].id);
+                printf("\t-- DESCRIPTION : %s\n", tasks[i].description);
+                printf("\t-- DEADLINE    : %s\n", tasks[i].deadline);
+                printf("\t-- STATUS      : %s\n", tasks[i].status);
+                printf("\n");
             }
         }
     } else printf("\tNot a Valid ID!\n");
@@ -460,7 +478,6 @@ void search_by_id(Task* tasks, int* tasks_index) {
 
 // A function that search a task by its TITLE: 
 void search_by_title(Task* tasks, int* tasks_index) {
-    // Asking the user to enter the title of the task:
     char target_title[20];
     printf("\tEnter the title of the task: ");
     fgets(target_title, sizeof(target_title), stdin);
@@ -472,8 +489,12 @@ void search_by_title(Task* tasks, int* tasks_index) {
     for (int i = 0; i < *tasks_index; i++) {
         if (strcmp(tasks[i].title, target_title) == 0) {
             found++;
-            // Task with matching title found
-            printf("\t-ID: %d\t-TITLE: %s\t-DESCRIPTION: %s\tDEADLINE: %s\t-STATUS: %s\n", tasks[i].id, tasks[i].title, tasks[i].description, tasks[i].deadline, tasks[i].status);
+            printf("\t>> %s\n", tasks[i].title);
+            printf("\t-- ID          : %d\n", tasks[i].id);
+            printf("\t-- DESCRIPTION : %s\n", tasks[i].description);
+            printf("\t-- DEADLINE    : %s\n", tasks[i].deadline);
+            printf("\t-- STATUS      : %s\n", tasks[i].status);
+            printf("\n");
         }
     }
     
@@ -506,7 +527,6 @@ void search_Tasks(Task* tasks, int* tasks_index) {
 }
 
 /* A function that display the statitistics such us complete, uncomplete works, the rest time of each task compared to its deadline: */
-// Function to display statistics (number of complete and incomplete tasks)
 void statistics(Task* tasks, int* tasks_index) {
     int checker = is_there_a_task(tasks_index);
     if (checker == 1) {
@@ -514,7 +534,7 @@ void statistics(Task* tasks, int* tasks_index) {
         int incomplete = 0;
 
         for (int i = 0; i < *tasks_index; i++) {
-            if (strcmp(tasks[i].status, "done") == 0) {
+            if (strcmp(tasks[i].status, "DONE") == 0) {
                 completed++;
             } else {
                 incomplete++;
@@ -568,4 +588,4 @@ int main() {
     return 0;
 }
 
-// END OF PROGRAMM:
+// END OF PROGRAM:
